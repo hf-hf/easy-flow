@@ -60,7 +60,7 @@
         methods: {
             // 点击节点
             clickNode() {
-                this.$emit('clickNode', this.node.id)
+                this.$emit('clickNode', this.node.id, this.node.type)
             },
             // 鼠标移动后抬起
             changeNodeSite() {

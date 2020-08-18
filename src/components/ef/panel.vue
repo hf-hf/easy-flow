@@ -72,6 +72,7 @@
     import { getDataB } from './data_B'
     import { getDataC } from './data_C'
     import { getDataD } from './data_D'
+    import { getDataE } from './data_E'
 
     export default {
         data() {
@@ -146,7 +147,7 @@
             this.jsPlumb = jsPlumb.getInstance()
             this.$nextTick(() => {
                 // 默认加载流程A的数据、在这里可以根据具体的业务返回符合流程数据格式的数据即可
-                this.dataReload(getDataB())
+                this.dataReload(getDataE())
             })
         },
         methods: {
@@ -378,6 +379,8 @@
                  * 这里可以进行业务判断、是否能够添加该节点
                  */
                 this.data.nodeList.push(node)
+                // 将编辑框修改为当前类型
+                this.$refs.nodeForm.nodeInit(this.data, node.id)
                 this.$nextTick(function () {
                     this.jsPlumb.makeSource(nodeId, this.jsplumbSourceOptions)
                     this.jsPlumb.makeTarget(nodeId, this.jsplumbTargetOptions)
@@ -419,8 +422,8 @@
                 })
                 return true
             },
-            clickNode(nodeId) {
-                this.activeElement.type = 'node'
+            clickNode(nodeId, nodeType) {
+                this.activeElement.type = nodeType
                 this.activeElement.nodeId = nodeId
                 this.$refs.nodeForm.nodeInit(this.data, nodeId)
             },
