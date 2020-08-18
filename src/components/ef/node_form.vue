@@ -5,7 +5,47 @@
                 编辑
             </div>
             <div class="ef-node-form-body">
-                <el-form :model="node" ref="dataForm" label-width="80px" v-show="type === 'node'">
+                <el-form :model="node" ref="dataForm" label-width="80px" v-show="type === 'httpRocketMqOut'">
+                    <el-form-item label="类型">
+                        <el-input v-model="node.type" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="名称">
+                        <el-input v-model="node.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="left坐标">
+                        <el-input v-model="node.left" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="top坐标">
+                        <el-input v-model="node.top" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="ico图标">
+                        <el-input v-model="node.ico"></el-input>
+                    </el-form-item>
+                    <el-form-item label="accessId">
+                        <el-input v-model="node.accessId"></el-input>
+                    </el-form-item>
+                    <el-form-item label="accessKey">
+                        <el-input v-model="node.accessKey"></el-input>
+                    </el-form-item>
+                    <el-form-item label="accountEndPoint">
+                        <el-input v-model="node.accountEndPoint"></el-input>
+                    </el-form-item>
+                    <el-form-item label="instanceId">
+                        <el-input v-model="node.instanceId"></el-input>
+                    </el-form-item>
+                    <el-form-item label="topic">
+                        <el-input v-model="node.topic"></el-input>
+                    </el-form-item>
+                    <el-form-item label="tag">
+                        <el-input v-model="node.tag"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button icon="el-icon-close">重置</el-button>
+                        <el-button type="primary" icon="el-icon-check" @click="save">保存</el-button>
+                    </el-form-item>
+                </el-form>
+
+                <el-form :model="node" ref="dataForm" label-width="100px" v-show="type === 'node'">
                     <el-form-item label="类型">
                         <el-input v-model="node.type" :disabled="true"></el-input>
                     </el-form-item>
@@ -61,6 +101,7 @@
             return {
                 visible: true,
                 // node 或 line
+                // TODO output
                 type: 'node',
                 node: {},
                 line: {},
@@ -87,10 +128,11 @@
              * @param id
              */
             nodeInit(data, id) {
-                this.type = 'node'
+                //this.type = 'node'
                 this.data = data
                 data.nodeList.filter((node) => {
                     if (node.id === id) {
+                        this.type = node.type
                         this.node = cloneDeep(node)
                     }
                 })
