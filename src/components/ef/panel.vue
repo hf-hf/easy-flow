@@ -285,9 +285,7 @@
             },
             // 删除激活的元素
             deleteElement() {
-                if (this.activeElement.type === 'node') {
-                    this.deleteNode(this.activeElement.nodeId)
-                } else if (this.activeElement.type === 'line') {
+                if (this.activeElement.type === 'line') {
                     this.$confirm('确定删除所点击的线吗?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
@@ -300,6 +298,10 @@
                         this.jsPlumb.deleteConnection(conn)
                     }).catch(() => {
                     })
+                } else {
+                    //if (this.activeElement.type === 'node') {
+                        this.deleteNode(this.activeElement.nodeId)
+                    //}
                 }
             },
             // 删除线
@@ -380,7 +382,9 @@
                  */
                 this.data.nodeList.push(node)
                 // 将编辑框修改为当前类型
-                this.$refs.nodeForm.nodeInit(this.data, node.id)
+                //this.$refs.nodeForm.nodeInit(this.data, node.id)
+                // 将当前节点设为激活
+                this.clickNode(node.id, node.type)
                 this.$nextTick(function () {
                     this.jsPlumb.makeSource(nodeId, this.jsplumbSourceOptions)
                     this.jsPlumb.makeTarget(nodeId, this.jsplumbTargetOptions)
