@@ -39,10 +39,10 @@
                     <el-form-item label="tag">
                         <el-input v-model="node.tag"></el-input>
                     </el-form-item>
-                    <el-form-item>
-                        <el-button icon="el-icon-close">重置</el-button>
+                    <!-- <el-form-item>
+                        <el-button icon="el-icon-close" @click="reset">重置</el-button>
                         <el-button type="primary" icon="el-icon-check" @click="save">保存</el-button>
-                    </el-form-item>
+                    </el-form-item> -->
                 </el-form>
 
                 <el-form :model="node" ref="dataForm" label-width="100px" v-show="type === 'node'">
@@ -71,20 +71,20 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item>
+                    <!-- <el-form-item>
                         <el-button icon="el-icon-close">重置</el-button>
                         <el-button type="primary" icon="el-icon-check" @click="save">保存</el-button>
-                    </el-form-item>
+                    </el-form-item> -->
                 </el-form>
 
                 <el-form :model="line" ref="dataForm" label-width="80px" v-show="type === 'line'">
                     <el-form-item label="条件">
                         <el-input v-model="line.label"></el-input>
                     </el-form-item>
-                    <el-form-item>
+                    <!-- <el-form-item>
                         <el-button icon="el-icon-close">重置</el-button>
                         <el-button type="primary" icon="el-icon-check" @click="saveLine">保存</el-button>
-                    </el-form-item>
+                    </el-form-item> -->
                 </el-form>
             </div>
             <!--            <div class="el-node-form-tag"></div>-->
@@ -94,7 +94,7 @@
 </template>
 
 <script>
-    import { cloneDeep } from 'lodash'
+    import { cloneDeep, merge, isEmpty } from 'lodash'
 
     export default {
         data() {
@@ -102,7 +102,7 @@
                 visible: true,
                 // node 或 line
                 // TODO output
-                type: 'node',
+                type: null,
                 node: {},
                 line: {},
                 data: {},
@@ -133,7 +133,7 @@
                 data.nodeList.filter((node) => {
                     if (node.id === id) {
                         this.type = node.type
-                        this.node = cloneDeep(node)
+                        this.node = node//cloneDeep(node)
                     }
                 })
             },
@@ -148,14 +148,19 @@
             save() {
                 this.data.nodeList.filter((node) => {
                     if (node.id === this.node.id) {
-                        node.name = this.node.name
-                        node.left = this.node.left
-                        node.top = this.node.top
-                        node.ico = this.node.ico
-                        node.state = this.node.state
+                        // node.name = this.node.name
+                        // node.left = this.node.left
+                        // node.top = this.node.top
+                        // node.ico = this.node.ico
+                        // node.state = this.node.state
+                        merge(node, this.node)
+                        console.log(this.data.nodeList)
                         this.$emit('repaintEverything')
                     }
                 })
+            },
+            reset(){
+                this.nodeInit(this.data, this.node.id)
             }
         }
     }

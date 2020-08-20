@@ -45,7 +45,7 @@
                 <div style="position:absolute;top: 2000px;left: 2000px;">&nbsp;</div>
             </div>
             <!-- 右侧表单 -->
-            <div style="width: 300px;border-left: 1px solid #dce3e8;background-color: #FBFBFB">
+            <div style="width: 300px;border-left: 1px solid #dce3e8;background-color: #FBFBFB" v-show="activeElement.nodeId">
                 <flow-node-form ref="nodeForm" @setLineLabel="setLineLabel" @repaintEverything="repaintEverything"></flow-node-form>
             </div>
         </div>
@@ -73,6 +73,7 @@
     import { getDataC } from './data_C'
     import { getDataD } from './data_D'
     import { getDataE } from './data_E'
+    import { clone, merge, isEmpty } from 'lodash'
 
     export default {
         data() {
@@ -88,6 +89,15 @@
                 flowHelpVisible: false,
                 // 数据
                 data: {},
+                emplyElement: {
+                    // 可选值 node 、line
+                    type: undefined,
+                    // 节点ID
+                    nodeId: undefined,
+                    // 连线ID
+                    sourceId: undefined,
+                    targetId: undefined
+                },
                 // 激活的元素、可能是节点、可能是连线
                 activeElement: {
                     // 可选值 node 、line
@@ -419,6 +429,10 @@
                         }
                         return true
                     })
+                    // 若当前节点与激活节点相同，则将激活节点清空
+                    if(this.activeElement.nodeId === nodeId){
+                        this.activeElement = clone(this.emplyElement)
+                    }
                     this.$nextTick(function () {
                         this.jsPlumb.removeAllEndpoints(nodeId);
                     })
