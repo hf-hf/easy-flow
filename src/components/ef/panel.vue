@@ -10,15 +10,18 @@
                     <el-divider direction="vertical"></el-divider>
                     <el-button type="text" icon="el-icon-download" size="large" @click="downloadData"></el-button>
                     <el-divider direction="vertical"></el-divider>
-                    <el-button type="text" icon="el-icon-plus" size="large" @click="zoomAdd"></el-button>
+                    <el-button type="text" icon="el-icon-check" size="large" @click="saveData"></el-button>
                     <el-divider direction="vertical"></el-divider>
-                    <el-button type="text" icon="el-icon-minus" size="large" @click="zoomSub"></el-button>
+                    <el-button type="text" icon="el-icon-zoom-in" size="large" @click="zoomAdd"></el-button>
+                    <el-divider direction="vertical"></el-divider>
+                    <el-button type="text" icon="el-icon-zoom-out" size="large" @click="zoomSub"></el-button>
                     <div style="float: right;margin-right: 5px">
                         <el-button type="info" plain round icon="el-icon-document" @click="dataInfo" size="mini">流程信息</el-button>
-                        <el-button type="primary" plain round @click="dataReloadA" icon="el-icon-refresh" size="mini">切换流程A</el-button>
-                        <el-button type="primary" plain round @click="dataReloadB" icon="el-icon-refresh" size="mini">切换流程B</el-button>
-                        <el-button type="primary" plain round @click="dataReloadC" icon="el-icon-refresh" size="mini">切换流程C</el-button>
-                        <el-button type="primary" plain round @click="dataReloadD" icon="el-icon-refresh" size="mini">自定义样式</el-button>
+                        <el-button type="primary" plain round @click="addFlow" icon="el-icon-folder-add" size="mini">添加新流程</el-button>
+                        <el-button v-for="(item, index) in this.getFlowList()" :key="item.id" 
+                            @click="loadData(item.id)" type="primary" plain round icon="el-icon-refresh" size="mini">
+                           切换{{ item.name }}
+                        </el-button>
                         <el-button type="info" plain round icon="el-icon-document" @click="openHelp" size="mini">帮助</el-button>
                     </div>
                 </div>
@@ -45,7 +48,7 @@
                 <div style="position:absolute;top: 2000px;left: 2000px;">&nbsp;</div>
             </div>
             <!-- 右侧表单 -->
-            <div style="width: 300px;border-left: 1px solid #dce3e8;background-color: #FBFBFB" v-show="activeElement.nodeId">
+            <div style="width: 300px;border-left: 1px solid #dce3e8;background-color: #FBFBFB" v-show="activeElement.type">
                 <flow-node-form ref="nodeForm" @setLineLabel="setLineLabel" @repaintEverything="repaintEverything"></flow-node-form>
             </div>
         </div>
@@ -74,6 +77,7 @@
     import { getDataD } from './data_D'
     import { getDataE } from './data_E'
     import { clone, merge, isEmpty } from 'lodash'
+    import flowList from '@/common/flowList'
 
     export default {
         data() {
@@ -247,6 +251,7 @@
                     if (!node.viewOnly) {
                         this.jsPlumb.draggable(node.id, {
                             containment: 'parent',
+                            grid: [20, 20],
                             stop: function (el) {
                                 // 拖拽节点结束后的对调
                                 console.log('拖拽结束: ', el)
@@ -398,8 +403,11 @@
                 this.$nextTick(function () {
                     this.jsPlumb.makeSource(nodeId, this.jsplumbSourceOptions)
                     this.jsPlumb.makeTarget(nodeId, this.jsplumbTargetOptions)
+                    // 锚点匹配类型
+                    // jsPlumb.addEndpoint(nodeId, {anchors: ['Right']})
                     this.jsPlumb.draggable(nodeId, {
                         containment: 'parent',
+                        grid: [20, 20],
                         stop: function (el) {
                             // 拖拽节点结束后的对调
                             console.log('拖拽结束: ', el)
@@ -481,9 +489,11 @@
                 this.data.nodeList = []
                 this.data.lineList = []
                 this.$nextTick(() => {
-                    data = lodash.cloneDeep(data)
+                    if(!isEmpty(data)){
+                        data = lodash.cloneDeep(data)
+                        this.data = data
+                    }
                     this.easyFlowVisible = true
-                    this.data = data
                     this.$nextTick(() => {
                         this.jsPlumb = jsPlumb.getInstance()
                         this.$nextTick(() => {
@@ -492,21 +502,30 @@
                     })
                 })
             },
-            // 模拟载入数据dataA
-            dataReloadA() {
-                this.dataReload(getDataA())
-            },
-            // 模拟载入数据dataB
-            dataReloadB() {
-                this.dataReload(getDataB())
-            },
-            // 模拟载入数据dataC
-            dataReloadC() {
-                this.dataReload(getDataC())
-            },
-            // 模拟载入数据dataD
-            dataReloadD() {
-                this.dataReload(getDataD())
+            loadData(id){
+                let data;
+                switch (id) {
+                    case "dataA":
+                        data = getDataA();
+                        break;
+                    case "dataB":
+                        data = getDataB();
+                        break;
+                    case "dataC":
+                        data = getDataC();
+                        break;
+                    case "dataD":
+                        data = getDataD();
+                        break;
+                    case "dataE":
+                        data = getDataE();
+                        break;
+                    default:
+                        data = null;
+                        break;
+                }
+                this.dataReload(data)
+                this.$message.success(id + "数据切换成功！")
             },
             zoomAdd() {
                 if (this.zoom >= 1) {
@@ -542,11 +561,44 @@
                 }).catch(() => {
                 })
             },
+            saveData(){
+                this.$confirm('确定要保存该流程数据吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    let data = JSON.stringify(this.data, null, '\t')
+                    console.log(data)
+                    this.$message.success("数据保存中,请稍后...")
+                }).catch(() => {
+                })
+            },
             openHelp() {
                 this.flowHelpVisible = true
                 this.$nextTick(function () {
                     this.$refs.flowHelp.init()
                 })
+            },
+            addFlow(){
+                this.$prompt('请输入流程名称', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: /^[\u4e00-\u9fa5_a-zA-Z0-9]{3,10}$/,
+                    inputErrorMessage: '流程名称格式不正确'
+                }).then(({ value }) => {
+                    this.data.name = value
+                    // 若未保存，则提示没有保存是否放弃当前的修改
+                    this.dataReload(null)
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消添加'
+                    })
+                });
+            },
+            getFlowList(){
+                return flowList
             }
         }
     }

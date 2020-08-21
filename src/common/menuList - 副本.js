@@ -9,8 +9,15 @@ const menuList = [
             {
                 id: '11',
                 type: 'timer',
-                name: 'kafkaIn',
+                name: '数据接入',
                 ico: 'el-icon-time',
+                // 自定义覆盖样式
+                style: {}
+            }, {
+                id: '12',
+                type: 'task',
+                name: '接口调用',
+                ico: 'el-icon-odometer',
                 // 自定义覆盖样式
                 style: {}
             }
@@ -30,30 +37,6 @@ const menuList = [
                 ico: 'el-icon-time',
                 // 自定义覆盖样式
                 style: {}
-            },
-            {
-                id: '12',
-                type: 'node',
-                name: '出区域',
-                ico: 'el-icon-time',
-                // 自定义覆盖样式
-                style: {}
-            },
-            {
-                id: '13',
-                type: 'node',
-                name: '断电拆除',
-                ico: 'el-icon-time',
-                // 自定义覆盖样式
-                style: {}
-            },
-            {
-                id: '14',
-                type: 'node',
-                name: '时间区间',
-                ico: 'el-icon-time',
-                // 自定义覆盖样式
-                style: {}
             }
         ]
     },
@@ -67,8 +50,15 @@ const menuList = [
             {
                 id: '31',
                 type: 'end',
-                name: 'kafkaOut',
+                name: '流程结束',
                 ico: 'el-icon-caret-right',
+                // 自定义覆盖样式
+                style: {}
+            }, {
+                id: '32',
+                type: 'over',
+                name: '数据清理',
+                ico: 'el-icon-shopping-cart-full',
                 // 自定义覆盖样式
                 style: {}
             }, {

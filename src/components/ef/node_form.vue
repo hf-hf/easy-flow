@@ -39,10 +39,39 @@
                     <el-form-item label="tag">
                         <el-input v-model="node.tag"></el-input>
                     </el-form-item>
-                    <!-- <el-form-item>
-                        <el-button icon="el-icon-close" @click="reset">重置</el-button>
-                        <el-button type="primary" icon="el-icon-check" @click="save">保存</el-button>
-                    </el-form-item> -->
+                </el-form>
+
+                <el-form :model="node" ref="dataForm" label-width="80px" v-show="type === 'tcpRocketMqOut'">
+                    <el-form-item label="类型">
+                        <el-input v-model="node.type" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="名称">
+                        <el-input v-model="node.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="left坐标">
+                        <el-input v-model="node.left" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="top坐标">
+                        <el-input v-model="node.top" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="ico图标">
+                        <el-input v-model="node.ico"></el-input>
+                    </el-form-item>
+                    <el-form-item label="accessKey">
+                        <el-input v-model="node.accessKey"></el-input>
+                    </el-form-item>
+                    <el-form-item label="secretKey">
+                        <el-input v-model="node.secretKey"></el-input>
+                    </el-form-item>
+                    <el-form-item label="nameSrvAddr">
+                        <el-input v-model="node.nameSrvAddr"></el-input>
+                    </el-form-item>
+                    <el-form-item label="topic">
+                        <el-input v-model="node.topic"></el-input>
+                    </el-form-item>
+                    <el-form-item label="tag">
+                        <el-input v-model="node.tag"></el-input>
+                    </el-form-item>
                 </el-form>
 
                 <el-form :model="node" ref="dataForm" label-width="100px" v-show="type === 'node'">
@@ -79,7 +108,7 @@
 
                 <el-form :model="line" ref="dataForm" label-width="80px" v-show="type === 'line'">
                     <el-form-item label="条件">
-                        <el-input v-model="line.label"></el-input>
+                        <el-input v-model="line.label" @blur="saveLine"></el-input>
                     </el-form-item>
                     <!-- <el-form-item>
                         <el-button icon="el-icon-close">重置</el-button>
