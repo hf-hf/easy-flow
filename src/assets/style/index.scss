@@ -3,6 +3,13 @@
     position: relative;
     overflow: scroll;
     flex: 1;
+    /*网格背景*/
+    /*90度直线，100灰度，0.1透明度，5%宽度，0透明度背景*/
+    background: linear-gradient(90deg, rgba(100, 100, 100, 0.1) 5%, transparent 0), 
+    /*0度直线，100灰度，0.1透明度，5%宽度，0透明度背景*/
+                linear-gradient(rgba(100, 100, 100, 0.1) 5%, transparent 0);
+    /*横纵向宽距*/
+    background-size: 20px 20px;
 }
 
 /*顶部工具栏*/
