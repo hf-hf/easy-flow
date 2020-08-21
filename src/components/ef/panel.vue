@@ -18,10 +18,19 @@
                     <div style="float: right;margin-right: 5px">
                         <el-button type="info" plain round icon="el-icon-document" @click="dataInfo" size="mini">流程信息</el-button>
                         <el-button type="primary" plain round @click="addFlow" icon="el-icon-folder-add" size="mini">添加新流程</el-button>
-                        <el-button v-for="(item, index) in this.getFlowList()" :key="item.id" 
+                        <el-select v-model="currentSeleced" filterable placeholder="请选择" @change="loadData">
+                            <el-option
+                            v-for="item in this.getFlowList()"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            >
+                            </el-option>
+                        </el-select>
+                        <!-- <el-button v-for="(item, index) in this.getFlowList()" :key="item.id" 
                             @click="loadData(item.id)" type="primary" plain round icon="el-icon-refresh" size="mini">
                            切换{{ item.name }}
-                        </el-button>
+                        </el-button> -->
                         <el-button type="info" plain round icon="el-icon-document" @click="openHelp" size="mini">帮助</el-button>
                     </div>
                 </div>
@@ -112,7 +121,8 @@
                     sourceId: undefined,
                     targetId: undefined
                 },
-                zoom: 0.5
+                zoom: 0.5,
+                currentSeleced: null,
             }
         },
         // 一些基础配置移动该文件中
@@ -160,8 +170,10 @@
         mounted() {
             this.jsPlumb = jsPlumb.getInstance()
             this.$nextTick(() => {
+                this.currentSeleced = flowList[0].id
+                this.loadData(this.currentSeleced)
                 // 默认加载流程A的数据、在这里可以根据具体的业务返回符合流程数据格式的数据即可
-                this.dataReload(getDataE())
+                // this.dataReload(getDataE())
             })
         },
         methods: {
