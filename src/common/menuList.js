@@ -1,7 +1,7 @@
 const menuList = [
     {
         id: '1',
-        type: 'group',
+        type: 'start',
         name: '开始节点',
         ico: 'el-icon-video-play',
         open: true,
@@ -18,7 +18,7 @@ const menuList = [
     },
     {
         id: '2',
-        type: 'group',
+        type: 'function',
         name: '功能节点',
         ico: 'el-icon-video-play',
         open: true,
@@ -59,7 +59,7 @@ const menuList = [
     },
     {
         id: '3',
-        type: 'group',
+        type: 'end',
         name: '结束节点',
         ico: 'el-icon-video-pause',
         open: true,
