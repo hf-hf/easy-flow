@@ -240,6 +240,12 @@
                             this.$message.error('不支持两个节点之间连线回环');
                             return false
                         }
+                        // 根据group判断是否允许连线
+                        let errorMsg = this.isIllegalLine(from, to)
+                        if (null != errorMsg) {
+                            this.$message.error(errorMsg);
+                            return false
+                        }
                         this.$message.success('连接成功')
                         return true
                     })
@@ -258,7 +264,7 @@
                     let node = this.data.nodeList[i]
                     // 设置源点，可以拖出线连接其他节点
                     this.jsPlumb.makeSource(node.id, lodash.merge(this.jsplumbSourceOptions, {}))
-                    // // 设置目标点，其他源点拖出的线可以连接该节点
+                    // 设置目标点，其他源点拖出的线可以连接该节点
                     this.jsPlumb.makeTarget(node.id, this.jsplumbTargetOptions)
                     if (!node.viewOnly) {
                         this.jsPlumb.draggable(node.id, {
@@ -402,7 +408,8 @@
                     left: left + 'px',
                     top: top + 'px',
                     ico: nodeMenu.ico,
-                    state: 'success'
+                    state: 'success',
+                    group: nodeMenu.group
                 }
                 /**
                  * 这里可以进行业务判断、是否能够添加该节点
@@ -478,6 +485,37 @@
             // 是否含有相反的线
             hashOppositeLine(from, to) {
                 return this.hasLine(to, from)
+            },
+            isIllegalLine(from, to){
+                let fromNode;
+                let toNode;
+                for (var i = 0; i < this.data.nodeList.length; i++) {
+                    var node = this.data.nodeList[i]
+                    if(node.id === from){
+                        fromNode = node
+                    }
+                    if(node.id === to){
+                        toNode = node
+                    }
+                    if(!isEmpty(fromNode) && !isEmpty(toNode)){
+                        break
+                    }
+                }
+                // 根据group判断是否能进行连线
+                if (toNode.group === "start"){
+                    return '开始节点不能被连接'
+                }
+                if (fromNode.group === "end"){
+                    return '结束节点不能发起连接'
+                }
+                // 同一个节点，只允许有一个from或一个to，优先满足group的校验
+                for (var i = 0; i < this.data.lineList.length; i++) {
+                    var line = this.data.lineList[i]
+                    if (line.from === from || line.to === to) {
+                        return '同一个节点不能发起多个连接，或者被多个节点连接'
+                    }
+                }
+                return null
             },
             nodeRightMenu(nodeId, evt) {
                 this.menu.show = true

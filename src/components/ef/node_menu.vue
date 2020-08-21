@@ -1,6 +1,6 @@
 <template>
     <div class="flow-menu" ref="tool">
-        <div v-for="menu  in  menuList" :key="menu.id">
+        <div v-for="menu in menuList" :key="menu.id">
             <span class="ef-node-pmenu" @click="menu.open = !menu.open"><i :class="{'el-icon-caret-bottom': menu.open,'el-icon-caret-right': !menu.open}"></i>&nbsp;{{menu.name}}</span>
             <ul v-show="menu.open" class="ef-node-menu-ul">
                 <draggable @end="end" @start="move" v-model="menu.children" :options="draggableOptions">
@@ -67,6 +67,7 @@
                     let children = this.menuList[i].children;
                     for (let j = 0; j < children.length; j++) {
                         if (children[j].type === type) {
+                            children[j].group = this.menuList[i].type
                             return children[j]
                         }
                     }
