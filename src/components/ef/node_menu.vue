@@ -14,7 +14,7 @@
 </template>
 <script>
     import draggable from 'vuedraggable'
-    import menuList from '../../common/menuList'
+    import menuList from '@/common/js/menuList'
 
     var mousePosition = {
         left: -1,

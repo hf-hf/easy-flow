@@ -18,6 +18,7 @@
                     <div style="float: right;margin-right: 5px">
                         <el-button type="info" plain round icon="el-icon-document" @click="dataInfo" size="mini">流程信息</el-button>
                         <el-button type="primary" plain round @click="addFlow" icon="el-icon-folder-add" size="mini">添加新流程</el-button>
+                        <el-button type="primary" plain round @click="resetFlow" icon="el-icon-refresh" size="mini">重置流程</el-button>
                         <el-select v-model="currentSeleced" filterable placeholder="请选择" @change="loadData">
                             <el-option
                             v-for="item in this.getFlowList()"
@@ -72,21 +73,21 @@
     import draggable from 'vuedraggable'
     // import { jsPlumb } from 'jsplumb'
     // 使用修改后的jsplumb
-    import './jsplumb'
-    import { easyFlowMixin } from '@/components/ef/mixins'
+    import '@/common/js/jsplumb'
+    import { easyFlowMixin } from '@/common/js/mixins'
     import flowNode from '@/components/ef/node'
     import nodeMenu from '@/components/ef/node_menu'
     import FlowInfo from '@/components/ef/info'
     import FlowHelp from '@/components/ef/help'
     import FlowNodeForm from './node_form'
     import lodash from 'lodash'
-    import { getDataA } from './data_A'
-    import { getDataB } from './data_B'
-    import { getDataC } from './data_C'
-    import { getDataD } from './data_D'
-    import { getDataE } from './data_E'
+    import { getDataA } from '@/common/data/data_A'
+    import { getDataB } from '@/common/data/data_B'
+    import { getDataC } from '@/common/data/data_C'
+    import { getDataD } from '@/common/data/data_D'
+    import { getDataE } from '@/common/data/data_E'
     import { clone, merge, isEmpty } from 'lodash'
-    import flowList from '@/common/flowList'
+    import flowList from '@/common/js/flowList'
 
     export default {
         data() {
@@ -649,6 +650,19 @@
             },
             getFlowList(){
                 return flowList
+            },
+            resetFlow(){
+                this.$confirm('确定要重置流程数据吗(未保存的数据会被丢弃)？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    this.loadData(this.currentSeleced)
+                    this.$message.success("数据重置完毕!")
+                }).catch(() => {
+                })
+                
             }
         }
     }
