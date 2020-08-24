@@ -20,13 +20,18 @@
                         <el-button type="primary" plain round @click="addFlow" icon="el-icon-folder-add" size="mini">添加新流程</el-button>
                         <el-button type="primary" plain round @click="resetFlow" icon="el-icon-refresh" size="mini">重置流程</el-button>
                         <el-select v-model="currentSeleced" filterable placeholder="请选择" @change="loadData">
-                            <el-option
-                            v-for="item in flowList"
-                            :key="item.id"
-                            :label="item.name"
-                            :value="item.id"
-                            >
-                            </el-option>
+                            <el-option-group
+                            v-for="group in flowList"
+                            :key="group.clientId"
+                            :label="group.clientId">
+                                <el-option
+                                v-for="item in group.list"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id"
+                                >
+                                </el-option>
+                            </el-option-group>
                         </el-select>
                         <!-- <el-button v-for="(item, index) in this.getFlowList()" :key="item.id" 
                             @click="loadData(item.id)" type="primary" plain round icon="el-icon-refresh" size="mini">
@@ -455,6 +460,7 @@
                         }
                         return true
                     })
+                    console.log(this.data.nodeList)
                     // 若当前节点与激活节点相同，则将激活节点清空
                     if(this.activeElement.nodeId === nodeId){
                         this.activeElement = clone(this.emplyElement)
@@ -515,6 +521,24 @@
                     }
                 }
                 return null
+            },
+            hasFloatingNode(){
+                let flag
+                for (var i = 0; i < this.data.nodeList.length; i++) {
+                    flag = true
+                    var node = this.data.nodeList[i]
+                    for (var j = 0; j < this.data.lineList.length; j++) {
+                        var line = this.data.lineList[j]
+                        if (line.from === node.id || line.to === node.id) {
+                            flag = false
+                            break
+                        }
+                    }
+                    if(flag){
+                        break
+                    }
+                }
+                return flag
             },
             nodeRightMenu(nodeId, evt) {
                 this.menu.show = true
@@ -598,6 +622,10 @@
                     this.$message.warning("当前流程数据为空，无法保存")
                     return
                 }
+                if(this.hasFloatingNode()){
+                    this.$message.warning("存在悬浮未连线的节点，无法保存")
+                    return
+                }
                 if(null != this.data.id){
                     this.$confirm('确定要保存当前流程？', '提示', {
                         confirmButtonText: '确定',
@@ -607,22 +635,36 @@
                     }).then(() => {
                         let data = JSON.stringify(this.data, null, '\t')
                         saveMixed(data)
+                            .then(response => {
+                                this.$message.success("保存成功！")
+                            })
+                            .catch(error => {
+                                console.log(error)
+                            })
                     }).catch((e) => {
                         console.log(e)
                     })
                 } else {
-                    this.$prompt('请输入EventType', '提示', {
+                    this.$prompt('请输入clientId:eventType', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        inputPattern: /^-?[1-9]\d*$/,
-                        inputErrorMessage: 'EventType格式不正确',
+                        inputPattern: /^\d{1,2}:{1}[1-9]\d{1,6}$/,
+                        inputErrorMessage: '格式不正确，请输入clientId和eventType，以:分隔',
                         closeOnClickModal: false
                     }).then((value) => {
-                        this.data.id = value.value
+                        let inputValue = value.value.split(':')
+                        this.data.clientId = Number(inputValue[0])
+                        this.data.id = Number(inputValue[1])
                         let data = JSON.stringify(this.data, null, '\t')
                         saveMixed(data)
-                        console.log(data)
-                        this.$message.success("数据保存中,请稍后...")
+                            .then(response => {
+                                // 刷新
+                                this.getFlowList(false, this.data.id)
+                                this.$message.success("保存成功！")
+                            })
+                            .catch(error => {
+                                console.log(error)
+                            })
                     }).catch((e) => {
                         console.log(e)
                     })
@@ -651,18 +693,23 @@
                     })
                 });
             },
-            getFlowList(init){
+            getFlowList(init, id){
                 listProject()
                     .then(response => {
                         let data = response.data
                         if(data.success){
                             this.flowList = data.data
-                            if(init){
-                                if(this.flowList.length > 0){
+                            if(this.flowList.length > 0){
+                                if(init){
                                     // 选中第一个
                                     this.$nextTick(() => {
-                                        this.currentSeleced = this.flowList[0].id
+                                        this.currentSeleced = this.flowList[0].list[0].id
                                         this.loadData(this.currentSeleced)
+                                    })
+                                } else if(isEmpty(id)) {
+                                    // 选中第一个
+                                    this.$nextTick(() => {
+                                        this.currentSeleced = id
                                     })
                                 }
                             }
