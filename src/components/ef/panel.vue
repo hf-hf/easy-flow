@@ -613,12 +613,12 @@
                 })
             },
             saveData(){
-                this.$confirm('确定要保存该流程数据吗？', '提示', {
+                this.$prompt('请输入EventType', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning',
-                    closeOnClickModal: false
-                }).then(() => {
+                    inputPattern: /^-?[1-9]\d*$/,
+                    inputErrorMessage: 'EventType格式不正确'
+                }).then((value) => {
                     let data = JSON.stringify(this.data, null, '\t')
                     console.log(data)
                     this.$message.success("数据保存中,请稍后...")
