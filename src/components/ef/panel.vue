@@ -21,7 +21,7 @@
                         <el-button type="primary" plain round @click="resetFlow" icon="el-icon-refresh" size="mini">重置流程</el-button>
                         <el-select v-model="currentSeleced" filterable placeholder="请选择" @change="loadData">
                             <el-option
-                            v-for="item in this.getFlowList()"
+                            v-for="item in flowList"
                             :key="item.id"
                             :label="item.name"
                             :value="item.id"
@@ -87,7 +87,9 @@
     import { getDataD } from '@/common/data/data_D'
     import { getDataE } from '@/common/data/data_E'
     import { clone, merge, isEmpty } from 'lodash'
-    import flowList from '@/common/js/flowList'
+    // import flowList from '@/common/js/flowList'
+    import { saveMixed, getData } from '@/common/js/api/mixed'
+    import { listProject } from '@/common/js/api/project'
 
     export default {
         data() {
@@ -124,6 +126,7 @@
                 },
                 zoom: 0.5,
                 currentSeleced: null,
+                flowList: null,
             }
         },
         // 一些基础配置移动该文件中
@@ -170,12 +173,7 @@
         },
         mounted() {
             this.jsPlumb = jsPlumb.getInstance()
-            this.$nextTick(() => {
-                this.currentSeleced = flowList[0].id
-                this.loadData(this.currentSeleced)
-                // 默认加载流程A的数据、在这里可以根据具体的业务返回符合流程数据格式的数据即可
-                // this.dataReload(getDataE())
-            })
+            this.getFlowList(true)
         },
         methods: {
             // 返回唯一标识
@@ -537,6 +535,7 @@
             // 加载流程图
             dataReload(data) {
                 this.easyFlowVisible = false
+                this.data.id = null
                 this.data.nodeList = []
                 this.data.lineList = []
                 this.$nextTick(() => {
@@ -553,30 +552,12 @@
                     })
                 })
             },
-            loadData(id){
-                let data;
-                switch (id) {
-                    case "dataA":
-                        data = getDataA();
-                        break;
-                    case "dataB":
-                        data = getDataB();
-                        break;
-                    case "dataC":
-                        data = getDataC();
-                        break;
-                    case "dataD":
-                        data = getDataD();
-                        break;
-                    case "dataE":
-                        data = getDataE();
-                        break;
-                    default:
-                        data = null;
-                        break;
+            async loadData(id){
+                let response = await getData(id)
+                if(response.success){
+                    this.dataReload(response.data)
+                    this.$message.success(response.data.name + "数据切换成功！")
                 }
-                this.dataReload(data)
-                this.$message.success(id + "数据切换成功！")
             },
             zoomAdd() {
                 if (this.zoom >= 1) {
@@ -613,17 +594,39 @@
                 })
             },
             saveData(){
-                this.$prompt('请输入EventType', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    inputPattern: /^-?[1-9]\d*$/,
-                    inputErrorMessage: 'EventType格式不正确'
-                }).then((value) => {
-                    let data = JSON.stringify(this.data, null, '\t')
-                    console.log(data)
-                    this.$message.success("数据保存中,请稍后...")
-                }).catch(() => {
-                })
+                if(isEmpty(this.data.nodeList)){
+                    this.$message.warning("当前流程数据为空，无法保存")
+                    return
+                }
+                if(null != this.data.id){
+                    this.$confirm('确定要保存当前流程？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning',
+                        closeOnClickModal: false
+                    }).then(() => {
+                        let data = JSON.stringify(this.data, null, '\t')
+                        saveMixed(data)
+                    }).catch((e) => {
+                        console.log(e)
+                    })
+                } else {
+                    this.$prompt('请输入EventType', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        inputPattern: /^-?[1-9]\d*$/,
+                        inputErrorMessage: 'EventType格式不正确',
+                        closeOnClickModal: false
+                    }).then((value) => {
+                        this.data.id = value.value
+                        let data = JSON.stringify(this.data, null, '\t')
+                        saveMixed(data)
+                        console.log(data)
+                        this.$message.success("数据保存中,请稍后...")
+                    }).catch((e) => {
+                        console.log(e)
+                    })
+                }
             },
             openHelp() {
                 this.flowHelpVisible = true
@@ -648,8 +651,28 @@
                     })
                 });
             },
-            getFlowList(){
-                return flowList
+            getFlowList(init){
+                listProject()
+                    .then(response => {
+                        let data = response.data
+                        if(data.success){
+                            this.flowList = data.data
+                            if(init){
+                                if(this.flowList.length > 0){
+                                    // 选中第一个
+                                    this.$nextTick(() => {
+                                        this.currentSeleced = this.flowList[0].id
+                                        this.loadData(this.currentSeleced)
+                                    })
+                                }
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+                
+                return null
             },
             resetFlow(){
                 this.$confirm('确定要重置流程数据吗(未保存的数据会被丢弃)？', '提示', {
