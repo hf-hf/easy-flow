@@ -5,7 +5,7 @@
                 编辑
             </div>
             <div class="ef-node-form-body">
-                <el-form :model="node" ref="dataForm" label-width="80px" v-show="type === 'httpRocketMqOut'">
+                <el-form :model="node" ref="dataForm" label-width="120px" v-show="type === 'httpRocketMqOut'">
                     <el-form-item label="类型">
                         <el-input v-model="node.type" :disabled="true"></el-input>
                     </el-form-item>
@@ -41,7 +41,7 @@
                     </el-form-item>
                 </el-form>
 
-                <el-form :model="node" ref="dataForm" label-width="80px" v-show="type === 'tcpRocketMqOut'">
+                <el-form :model="node" ref="dataForm" label-width="120px" v-show="type === 'tcpRocketMqOut'">
                     <el-form-item label="类型">
                         <el-input v-model="node.type" :disabled="true"></el-input>
                     </el-form-item>
@@ -74,7 +74,7 @@
                     </el-form-item>
                 </el-form>
 
-                <el-form :model="node" ref="dataForm" label-width="100px" v-show="type === 'node'">
+                <el-form :model="node" ref="dataForm" label-width="120px" v-show="type === 'node'">
                     <el-form-item label="类型">
                         <el-input v-model="node.type" :disabled="true"></el-input>
                     </el-form-item>
@@ -106,7 +106,7 @@
                     </el-form-item> -->
                 </el-form>
 
-                <el-form :model="line" ref="dataForm" label-width="80px" v-show="type === 'line'">
+                <el-form :model="line" ref="dataForm" label-width="120px" v-show="type === 'line'">
                     <el-form-item label="条件">
                         <el-input v-model="line.label" @blur="saveLine"></el-input>
                     </el-form-item>
