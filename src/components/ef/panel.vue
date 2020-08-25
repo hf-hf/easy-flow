@@ -18,6 +18,7 @@
                     <div style="float: right;margin-right: 5px">
                         <el-button type="info" plain round icon="el-icon-document" @click="dataInfo" size="mini">流程信息</el-button>
                         <el-button type="primary" plain round @click="addFlow" icon="el-icon-folder-add" size="mini">添加新流程</el-button>
+                        <el-button type="primary" plain round @click="removeFlow" icon="el-icon-folder-remove" size="mini">删除流程</el-button>
                         <el-button type="primary" plain round @click="resetFlow" icon="el-icon-refresh" size="mini">重置流程</el-button>
                         <el-select v-model="currentSeleced" filterable placeholder="请选择" @change="loadData">
                             <el-option-group
@@ -93,7 +94,7 @@
     import { getDataE } from '@/common/data/data_E'
     import { clone, merge, isEmpty } from 'lodash'
     // import flowList from '@/common/js/flowList'
-    import { saveMixed, getData } from '@/common/js/api/mixed'
+    import { saveMixed, getData, deleteMixed } from '@/common/js/api/mixed'
     import { listProject } from '@/common/js/api/project'
 
     export default {
@@ -371,6 +372,10 @@
              * @param mousePosition 鼠标拖拽结束的坐标
              */
             addNode(evt, nodeMenu, mousePosition) {
+                if(this.data.nodeList === undefined){
+                    this.$message.error("请先添加新流程")
+                    return
+                }
                 var screenX = evt.originalEvent.clientX, screenY = evt.originalEvent.clientY
                 let efContainer = this.$refs.efContainer
                 var containerRect = efContainer.getBoundingClientRect()
@@ -389,22 +394,23 @@
                 // 动态生成名字
                 var origName = nodeMenu.name
                 var nodeName = origName
-                var index = 1
-                while (index < 10000) {
-                    var repeat = false
-                    for (var i = 0; i < this.data.nodeList.length; i++) {
-                        let node = this.data.nodeList[i]
-                        if (node.name === nodeName) {
-                            nodeName = origName + index
-                            repeat = true
-                        }
-                    }
-                    if (repeat) {
-                        index++
-                        continue
-                    }
-                    break
-                }
+                // 存在重复node，则递增后缀数
+                // var index = 1
+                // while (index < 10000) {
+                //     var repeat = false
+                //     for (var i = 0; i < this.data.nodeList.length; i++) {
+                //         let node = this.data.nodeList[i]
+                //         if (node.name === nodeName) {
+                //             nodeName = origName + index
+                //             repeat = true
+                //         }
+                //     }
+                //     if (repeat) {
+                //         index++
+                //         continue
+                //     }
+                //     break
+                // }
                 var node = {
                     id: nodeId,
                     name: nodeName,
@@ -648,12 +654,12 @@
                     this.$prompt('请输入clientId:eventType', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        inputPattern: /^\d{1,2}:{1}[1-9]\d{1,6}$/,
+                        inputPattern: /^\w{6,50}:{1}[1-9]\d{1,6}$/,
                         inputErrorMessage: '格式不正确，请输入clientId和eventType，以:分隔',
                         closeOnClickModal: false
                     }).then((value) => {
                         let inputValue = value.value.split(':')
-                        this.data.clientId = Number(inputValue[0])
+                        this.data.clientId = inputValue[0]
                         this.data.id = Number(inputValue[1])
                         let data = JSON.stringify(this.data, null, '\t')
                         saveMixed(data)
@@ -693,6 +699,25 @@
                     })
                 });
             },
+            removeFlow(){
+                this.$confirm('确定要移除当前流程？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    closeOnClickModal: false
+                }).then(() => {
+                    deleteMixed(this.data.id)
+                        .then(response => {
+                            this.getFlowList(true)
+                            this.$message.success("删除成功！")
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }).catch((e) => {
+                    console.log(e)
+                })
+            },
             getFlowList(init, id){
                 listProject()
                     .then(response => {
@@ -729,7 +754,6 @@
                     closeOnClickModal: false
                 }).then(() => {
                     this.loadData(this.currentSeleced)
-                    this.$message.success("数据重置完毕!")
                 }).catch(() => {
                 })
                 
