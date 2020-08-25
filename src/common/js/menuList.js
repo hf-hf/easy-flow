@@ -26,7 +26,7 @@ const menuList = [
             {
                 id: '11',
                 type: 'node',
-                name: '进区域',
+                name: 'inArea',
                 ico: 'el-icon-time',
                 // 自定义覆盖样式
                 style: {}
@@ -34,7 +34,7 @@ const menuList = [
             {
                 id: '12',
                 type: 'node',
-                name: '出区域',
+                name: 'outArea',
                 ico: 'el-icon-time',
                 // 自定义覆盖样式
                 style: {}
@@ -42,7 +42,7 @@ const menuList = [
             {
                 id: '13',
                 type: 'node',
-                name: '断电拆除',
+                name: 'cutWire',
                 ico: 'el-icon-time',
                 // 自定义覆盖样式
                 style: {}
@@ -50,7 +50,7 @@ const menuList = [
             {
                 id: '14',
                 type: 'node',
-                name: '时间区间',
+                name: 'timeRange',
                 ico: 'el-icon-time',
                 // 自定义覆盖样式
                 style: {}
