@@ -9,3 +9,7 @@ export function saveMixed(data){
 export function getData(id){
     return request('get', baseUrl + "/data/" + id);
 }
+
+export function deleteMixed(id){
+    return request('delete', baseUrl + '/' + id);
+}
