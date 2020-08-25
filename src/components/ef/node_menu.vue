@@ -4,7 +4,7 @@
             <span class="ef-node-pmenu" @click="menu.open = !menu.open"><i :class="{'el-icon-caret-bottom': menu.open,'el-icon-caret-right': !menu.open}"></i>&nbsp;{{menu.name}}</span>
             <ul v-show="menu.open" class="ef-node-menu-ul">
                 <draggable @end="end" @start="move" v-model="menu.children" :options="draggableOptions">
-                    <li v-for="subMenu in menu.children" class="ef-node-menu-li" :key="subMenu.id" :type="subMenu.type">
+                    <li v-for="subMenu in menu.children" class="ef-node-menu-li" :key="subMenu.id" :type="subMenu.type" :name="subMenu.name">
                         <i :class="subMenu.ico"></i> {{subMenu.name}}
                     </li>
                 </draggable>
@@ -62,11 +62,11 @@
         },
         methods: {
             // 根据类型获取左侧菜单对象
-            getMenuByType(type) {
+            getMenuByType(type, name) {
                 for (let i = 0; i < this.menuList.length; i++) {
                     let children = this.menuList[i].children;
                     for (let j = 0; j < children.length; j++) {
-                        if (children[j].type === type) {
+                        if (children[j].type === type && children[j].name === name) {
                             children[j].group = this.menuList[i].type
                             return children[j]
                         }
@@ -76,7 +76,8 @@
             // 拖拽开始时触发
             move(evt, a, b, c) {
                 var type = evt.item.attributes.type.nodeValue
-                this.nodeMenu = this.getMenuByType(type)
+                var name = evt.item.attributes.name.nodeValue
+                this.nodeMenu = this.getMenuByType(type, name)
             },
             // 拖拽结束时触发
             end(evt, e) {
