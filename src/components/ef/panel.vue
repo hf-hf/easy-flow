@@ -566,6 +566,7 @@
             dataReload(data) {
                 this.easyFlowVisible = false
                 this.data.id = null
+                this.data.type = null
                 this.data.nodeList = []
                 this.data.lineList = []
                 this.$nextTick(() => {
@@ -586,6 +587,7 @@
                 let response = await getData(id)
                 if(response.success){
                     this.dataReload(response.data)
+                    this.activeElement = clone(this.emplyElement)
                     this.$message.success(response.data.name + "数据切换成功！")
                 }
             },
